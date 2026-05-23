@@ -1,0 +1,28 @@
+# .bootstrap.toml
+#
+# bootstrap.sh への指示書。
+# README.md が固まった時点で、その内容を要約して作成する。
+# このファイルが存在することが「このプロジェクトを正式に始める」意思表示になる。
+#
+# 配置場所: プロジェクトディレクトリの直下（README.md と同じ階層）
+
+[project]
+# プロジェクト名。CLAUDE.md などのプレースホルダ置換に使う
+name = "yutori"
+# 一行説明（任意）
+description = "ゲーム制作で学ぶプログラミング学習サービス"
+
+[stack]
+# 技術スタックの識別子。
+# この id ひとつで、以下の選択が一意に決まる:
+#   - Makefile   : templates/makefiles/Makefile.<id>
+#   - verify.sh  : templates/verify/verify.<id>.sh
+# yutori は Next.js / TypeScript / Drizzle / Supabase 構成のため
+# typescript-supabase を用いる。
+# 採点エンジンの QuickJS-WASM や第二フェーズの Go-WASM は
+# パッケージ内の実装であり、検証フローの分岐を生まないため id には影響しない。
+id = "typescript-supabase"
+
+# skills のベース。templates/skills/<skills_base>/ を選ぶ
+# 同じ言語なら複数スタックで共有できるため、id とは別キーにしている
+skills_base = "typescript"
