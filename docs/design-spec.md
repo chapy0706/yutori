@@ -2,8 +2,8 @@
 
 ゲーム制作で学ぶプログラミング学習サービス
 
-バージョン: 0.4 (構想フェーズ)
-最終更新: 2026-05-23
+バージョン: 0.5 (構想フェーズ)
+最終更新: 2026-06-07
 
 サービス名 yutori について:
 「ゆとり」は、空間や時間に余白があること、詰め込まないことを指す言葉である。
@@ -602,7 +602,14 @@ yutori が人を引き寄せる主たる引力は、報酬ガチャではなく�
 | Lint / Format | Biome | 採点パイプラインの初期構文チェックにも利用 |
 | サンドボックス | QuickJS-WASM | Web Worker 内で実行 |
 | ID 生成 | nanoID | 課題等の識別子。推測不能なランダム ID (10.3 参照) |
-| 解析レイヤー (第二フェーズ) | Go 1.24 WASM (リアクター) | AST 解析・メトリクス |
+| パッケージマネージャ | pnpm | aarch64 ネイティブ。Nixpacks が lock を自動検知 |
+| ホスティング | Oracle Cloud A1 + Coolify | セルフホスト PaaS。ARM aarch64 |
+| 入口 (DNS/TLS/WAF) | Cloudflare + Cloudflare Tunnel | A1 はパブリック IP を持たず Tunnel 経由で公開 |
+| リバースプロキシ | Traefik | ホスト名で振り分け (Coolify 管理) |
+| DB | PostgreSQL (A1 上) | Coolify 管理。アプリの隣に置く |
+| 認証 | Keycloak + Auth.js | A1 上の Keycloak を IdP とし Auth.js で委譲 |
+| ストレージ | A1 ファイルシステム + Cloudflare | 静的アセットを A1 に置き Cloudflare で配信 |
+| 解析レイヤー (第二フェーズ) | Go 1.24 WASM (リアクター) | AST 解析・メトリクス。A1 上で実験 |
 
 ### 10.2 識別子の設計
 
@@ -633,17 +640,44 @@ yutori が人を引き寄せる主たる引力は、報酬ガチャではなく�
 
 ### 10.3 インフラ
 
-| 領域 | 採用 | 理由 |
-|------|------|------|
-| ホスティング | Vercel | Next.js との親和性。Hobby プランは商用不可のため収益化時に有料移行 |
-| DB / 認証 / ストレージ | Supabase | 認証・ストレージが要るため統合プラットフォームを採用 |
+Oracle Cloud A1 (Always Free 枠・ARM aarch64) を取得済みであり、これを基盤とする
+セルフホスト構成を採用する。当初の Vercel + Supabase 構成からの変更であり、
+経緯と理由は ADR 0003 (置換済み) および ADR 0008 を参照。
 
-Neon ではなく Supabase を選ぶ理由: 本サービスは認証とアセット配信 (ストレージ) を必要とする。
-Neon は Postgres 単体のため認証・ストレージを別途構築する必要があり、MVP の工数が増える。
-Supabase は認証・DB・ストレージが一つの無料枠に収まる。
-Drizzle は Supabase の Postgres にそのまま接続できるため、スタックを犠牲にしない。
-将来 DB のみ切り出したくなった場合、Postgres 同士のため Neon への移行も比較的素直に行える。
-(詳細は ADR 0003 を参照。)
+| 領域 | 採用 | 役割 |
+|------|------|------|
+| ホスティング | Oracle Cloud A1 + Coolify | アプリ本体のデプロイ・運用 (PaaS) |
+| 入口 | Cloudflare + Cloudflare Tunnel | DNS・TLS 終端・WAF。A1 を Tunnel 経由で公開 |
+| リバースプロキシ | Traefik (Coolify 管理) | ホスト名で各コンテナへ振り分け |
+| DB | PostgreSQL (A1 上・Coolify 管理) | アプリの主データ |
+| 認証 | Keycloak (A1 上) + Auth.js | Keycloak を IdP とし Auth.js で委譲 |
+| ストレージ | A1 ファイルシステム + Cloudflare 配信 | WebP・音源などの静的アセット |
+
+#### 構成の要点
+
+A1 はパブリック IP を持たない。外部からの到達は Cloudflare Tunnel 経由のみとし、
+管理用 SSH は E2.Micro 踏み台 (MFA) を経由する別経路とする。攻撃面を最小化する設計。
+
+TLS は Cloudflare で終端し、その南側 (Tunnel 内・Traefik・各コンテナ) はすべて
+平文 HTTP で完結する。A1 にパブリック IP がなく Let's Encrypt の HTTP-01 チャレンジが
+成立しないため、Traefik では TLS を扱わない。
+
+アプリはインフラの詳細を知らない。接続情報 (DATABASE_URL、Keycloak の issuer URL 等) は
+すべて環境変数で注入し、ホスト名や物理配置をコードに埋め込まない。これにより
+インフラの変更がアプリのコードに波及しない。詳細は docs/a1-infra-reference.md を参照。
+
+#### Supabase からの変更について
+
+当初は Vercel + Supabase を採用していた (認証・DB・ストレージが一つの無料枠に
+収まる利点から)。A1 を取得したことで、商用利用の制限がなく、本質的にコストゼロで、
+インフラを自分で握れるセルフホスト構成が可能になった。本番運用は約半年後を
+想定しており、その時期までに自前構成を育てる方針とする。
+
+認証は Supabase Auth ではなく Keycloak + Auth.js を最初から採用する。
+A1 を箱として持っている以上、Supabase で建てて後から移行する工程は無駄になるため。
+クリーンアーキテクチャの依存性逆転により、認証実装は infra 層に閉じ込められ、
+core 層は AuthGateway 等のポート越しに認証を扱う。将来認証基盤を変えても
+core は無傷である。
 
 ### 10.4 ゴール WebP の自動生成パイプライン
 

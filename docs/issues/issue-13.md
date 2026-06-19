@@ -27,6 +27,7 @@ yutori の「帰ってくる場所」としての居場所感を担う中心機�
 - [ ] BGM・SE の ON/OFF がプロフィール設定から切り替え可能
 - [ ] BGM・SE はデフォルト OFF
 - [ ] アニメーションは OS の prefers-reduced-motion を尊重する
+- [ ] 無料音源・画像アセットは A1 のファイルシステムに配置し、Cloudflare 経由で配信される
 - [ ] 無料音源の出典・ライセンスが public/audio/credits.md に集約されている
 - [ ] `make verify` がエラーを発生させない
 
@@ -36,6 +37,7 @@ yutori の「帰ってくる場所」としての居場所感を担う中心機�
 - 音の再生は ui/feedback/sound-manager.ts に集約する。失敗音は否定的に響かせない (音でユーザーを罰しない)
 - prefers-reduced-motion の解決は ui/feedback/motion.ts に集約する
 - コース完走による直接獲得アイテム (達成の証明を兼ねる) は、完走判定のタイミングで付与する。完走判定のロジックは core/learning/progress-service.ts に持たせる
+- アセット (音源・画像・背景) は A1 のファイルシステムに置き、Cloudflare のキャッシュで配信する (ADR 0008)。A1 は 150GB のストレージを持つため、外部オブジェクトストレージは MVP では不要。Cloudflare が経路にいるため CDN 配信もそのまま成立する
 
 ## 関連ADR・依存issue
 

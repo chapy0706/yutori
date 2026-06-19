@@ -1,7 +1,7 @@
 ---
-status: open
+status: closed
 created_at: 2026-05-24
-closed_at:
+closed_at: 2026-06-20
 ---
 
 # issue-03: モノレポ初期化とワークスペース設定
@@ -17,14 +17,14 @@ content/ (コース定義データ) と tooling/ (運用スクリプト) のデ�
 
 ## 受け入れ条件
 
-- [ ] pnpm workspace が設定され、各パッケージが認識されている
-- [ ] apps/web に Next.js (App Router) プロジェクトが初期化されている
-- [ ] packages/contracts, packages/sandbox, packages/grader がそれぞれ空パッケージとして存在する
-- [ ] tsconfig.base.json がルートにあり、各パッケージから継承している
-- [ ] Biome の設定がルートにあり、全パッケージに適用される
-- [ ] Tailwind CSS と shadcn/ui が apps/web に導入されている
-- [ ] content/courses/ と tooling/ のディレクトリが存在する
-- [ ] `make verify` がエラーを発生させない
+- [x] pnpm workspace が設定され、各パッケージが認識されている
+- [x] apps/web に Next.js (App Router) プロジェクトが初期化されている
+- [x] packages/contracts, packages/sandbox, packages/grader がそれぞれ空パッケージとして存在する
+- [x] tsconfig.base.json がルートにあり、各パッケージから継承している
+- [x] Biome の設定がルートにあり、全パッケージに適用される
+- [x] Tailwind CSS と shadcn/ui が apps/web に導入されている
+- [x] content/courses/ と tooling/ のディレクトリが存在する
+- [x] `make verify` がエラーを発生させない
 
 ## 技術的な検討事項
 
@@ -32,6 +32,12 @@ content/ (コース定義データ) と tooling/ (運用スクリプト) のデ�
 - tsconfig は base を継承する形にし、各パッケージの paths はパッケージ側で設定する
 - Biome はルートに1つだけ設定を置き、全パッケージに適用する方針とする
 - nanoID パッケージもこの段階でインストールしておく
+- デプロイは Oracle Cloud A1 + Coolify を前提とする (ADR 0008)。
+  pnpm-lock.yaml をコミットすれば Coolify の Nixpacks が自動検知する。
+  Coolify の Install Command は `pnpm install --frozen-lockfile` に固定する。
+  pnpm は aarch64 (ARM) ネイティブで動くため A1 上で問題なく動作する
+- モノレポのため、Coolify では apps/web をビルド対象ルートとして指定する想定。
+  ビルド・デプロイ設定の具体は issue-05 以降のインフラ整備で詰める
 
 ## 関連ADR・依存issue
 

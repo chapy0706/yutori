@@ -109,11 +109,16 @@ yutori は「優しい厳しさで、仕様思考を育てる」というポジ�
 | Lint / Format | Biome |
 | サンドボックス | QuickJS-WASM |
 | ID 生成 | nanoID |
-| ホスティング | Vercel |
-| DB / 認証 / ストレージ | Supabase |
+| ホスティング | Oracle Cloud A1 + Coolify (セルフホスト) |
+| 入口 | Cloudflare + Cloudflare Tunnel |
+| DB | PostgreSQL (A1 上) |
+| 認証 | Keycloak + Auth.js |
+| ストレージ | A1 + Cloudflare 配信 |
 
 採点エンジンは Next.js に依存しない独立パッケージとして実装する。
 将来の解析レイヤーには Go 1.24 WASM (リアクター) を検討している。
+インフラは Oracle Cloud A1 上のセルフホスト構成。A1 はパブリック IP を持たず、
+Cloudflare Tunnel 経由で公開する。構成の詳細は docs/a1-infra-reference.md を参照。
 
 ---
 
@@ -145,6 +150,7 @@ yutori/
 | docs/design-spec.md | 設計仕様書。思想と全体像の本体 |
 | docs/directory-structure.md | ディレクトリ構成の詳細 |
 | docs/glossary.md | yutori 固有の用語集 |
+| docs/a1-infra-reference.md | Oracle Cloud A1 インフラ構成リファレンス |
 | docs/adr/ | アーキテクチャ決定記録 (なぜその選択をしたか) |
 
 設計の「なぜ」を知りたい場合は docs/adr/ を読むとよい。

@@ -13,19 +13,19 @@
  *    学習データに一切影響しないことを、スキーマ構造でも表現する。
  */
 
+import { relations } from "drizzle-orm";
 import {
-  pgTable,
-  uuid,
-  text,
-  integer,
   boolean,
-  timestamp,
+  index,
+  integer,
   jsonb,
   pgEnum,
+  pgTable,
+  text,
+  timestamp,
   unique,
-  index,
+  uuid,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
 // 列挙型

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "packages/contracts/src/**/*.ts",
+    "packages/sandbox/src/**/*.ts",
+    "packages/grader/src/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/node_modules"]
+}
