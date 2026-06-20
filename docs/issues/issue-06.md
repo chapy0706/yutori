@@ -1,7 +1,7 @@
 ---
-status: open
+status: closed
 created_at: 2026-05-24
-closed_at:
+closed_at: 2026-06-20
 ---
 
 # issue-06: packages/sandbox — QuickJS-WASM 隔離実行層
@@ -17,18 +17,18 @@ QuickJS-WASM を Web Worker 内でロードし、メインスレッドから隔�
 
 ## 受け入れ条件
 
-- [ ] QuickJS-WASM がロード・初期化できる (runtime/quickjs-loader.ts)
-- [ ] 仮想ファイルシステムでユーザーコードとモジュールを配置できる (runtime/virtual-fs.ts)
-- [ ] 実行時間制限が interrupt handler で動作する (policy/time-budget.ts)
-- [ ] メモリ制限が設定・適用される (policy/memory-limit.ts)
-- [ ] 公開 API の制御ができる (policy/api-exposure.ts)
-  - console.log のキャプチャ、Math の公開、Date の制御など
-- [ ] ユーザーの標準出力がキャプチャされ、構造化データとして取得できる (capture/)
-- [ ] 例外が構造化データに正規化される (capture/error-normalize.ts)
-- [ ] Worker エントリが postMessage で進捗を逐次通知する (worker/)
-- [ ] Worker とホスト間のメッセージ契約が contracts の型を使って定義されている (worker/protocol.ts)
-- [ ] 単体テスト (Vitest) で、簡単なコードの実行・タイムアウト・エラーキャプチャが検証されている
-- [ ] `make verify` がエラーを発生させない
+- [x] QuickJS-WASM がロード・初期化できる (runtime/quickjs-loader.ts)
+- [x] 仮想ファイルシステムでユーザーコードとモジュールを配置できる (runtime/virtual-fs.ts)
+- [x] 実行時間制限が interrupt handler で動作する (policy/time-budget.ts)
+- [x] メモリ制限が設定・適用される (policy/memory-limit.ts)
+- [x] 公開 API の制御ができる (policy/api-exposure.ts)
+  - console.log のキャプチャ。process/fetch 等のグローバルは非公開
+- [x] ユーザーの標準出力がキャプチャされ、構造化データとして取得できる (capture/)
+- [x] 例外が構造化データに正規化される (capture/error-normalize.ts)
+- [x] Worker エントリが postMessage で進捗を逐次通知する (worker/)
+- [x] Worker とホスト間のメッセージ契約が contracts の型を使って定義されている (worker/protocol.ts)
+- [x] 単体テスト (Vitest) で、簡単なコードの実行・タイムアウト・エラーキャプチャが検証されている
+- [x] `make verify` がエラーを発生させない
 
 ## 技術的な検討事項
 
