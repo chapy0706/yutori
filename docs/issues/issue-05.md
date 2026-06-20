@@ -1,7 +1,7 @@
 ---
-status: open
+status: closed
 created_at: 2026-05-24
-closed_at:
+closed_at: 2026-06-20
 ---
 
 # issue-05: DB スキーマと認証基盤 (Keycloak + Auth.js + Drizzle)
@@ -24,22 +24,22 @@ A1 を箱として持っているため、Supabase で建てて後から移行�
 
 ## 受け入れ条件
 
-- [ ] A1 上の PostgreSQL に接続でき、接続情報 (DATABASE_URL) が環境変数で注入されている
-- [ ] PostgreSQL は Coolify 管理。外部にポートを晒さず、Docker 内部ホスト名で接続する
-- [ ] apps/web/src/infra/db/schema.ts に Drizzle スキーマが定義されている
+- [x] A1 上の PostgreSQL に接続でき、接続情報 (DATABASE_URL) が環境変数で注入されている
+- [x] PostgreSQL は Coolify 管理。外部にポートを晒さず、Docker 内部ホスト名で接続する
+- [x] apps/web/src/infra/db/schema.ts に Drizzle スキーマが定義されている
   - 学習者系: users, profiles
   - コンテンツ系: courses, tasks, test_cases, hints
   - 活動記録系: submissions, task_progress
   - 他者性: encouragement_messages, daily_bonuses
   - Cosmetic 系: cosmetic_items, user_inventory, user_loadout
-- [ ] apps/web/src/infra/db/client.ts に DB 接続クライアントが設定されている
-- [ ] core 層に認証のポート (core/ports/auth-gateway.ts) が定義されている
-- [ ] apps/web/src/infra/auth/ に Auth.js + Keycloak プロバイダーの実装があり、
+- [x] apps/web/src/infra/db/client.ts に DB 接続クライアントが設定されている
+- [x] core 層に認証のポート (core/ports/auth-gateway.ts) が定義されている
+- [x] apps/web/src/infra/auth/ に Auth.js + Keycloak プロバイダーの実装があり、
       AuthGateway ポートを満たす
-- [ ] Keycloak への委譲によるログイン・ログアウトが動作する
-- [ ] users テーブルは Keycloak の sub (subject) を参照する薄い存在とする
-- [ ] Drizzle のマイグレーションが実行可能である
-- [ ] `make verify` がエラーを発生させない
+- [x] Keycloak への委譲によるログイン・ログアウトが動作する
+- [x] users テーブルは Keycloak の sub (subject) を参照する薄い存在とする
+- [x] Drizzle のマイグレーションが実行可能である
+- [x] `make verify` がエラーを発生させない
 
 ## 技術的な検討事項
 
