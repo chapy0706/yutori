@@ -1,7 +1,7 @@
 ---
-status: open
+status: closed
 created_at: 2026-05-24
-closed_at:
+closed_at: 2026-06-20
 ---
 
 # issue-04: packages/contracts — 共有 Zod スキーマと型定義
@@ -18,7 +18,7 @@ Zod スキーマが仕様の単一の源 (Single Source of Truth) となるこ�
 
 ## 受け入れ条件
 
-- [ ] packages/contracts/src/ に以下のスキーマが定義されている
+- [x] packages/contracts/src/ に以下のスキーマが定義されている
   - course.ts (Course / Task のドメイン型)
   - test-case.ts (テスト5観点・TestCase payload)
   - submission.ts (採点結果・観点結果)
@@ -26,9 +26,9 @@ Zod スキーマが仕様の単一の源 (Single Source of Truth) となるこ�
   - user.ts (User / Profile のドメイン型)
   - cosmetic.ts (Cosmetic 関連のドメイン型)
   - index.ts (re-export)
-- [ ] 各スキーマから TypeScript の型が推論される (z.infer)
-- [ ] 単体テスト (Vitest) でスキーマの基本的な parse / safeParse が検証されている
-- [ ] `make verify` がエラーを発生させない
+- [x] 各スキーマから TypeScript の型が推論される (z.infer)
+- [x] 単体テスト (Vitest) でスキーマの基本的な parse / safeParse が検証されている
+- [x] `make verify` がエラーを発生させない
 
 ## 技術的な検討事項
 
