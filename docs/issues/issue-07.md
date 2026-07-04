@@ -1,7 +1,7 @@
 ---
-status: open
+status: closed
 created_at: 2026-05-24
-closed_at:
+closed_at: 2026-07-04
 ---
 
 # issue-07: packages/grader — 採点エンジン
