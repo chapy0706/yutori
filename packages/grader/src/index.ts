@@ -1,4 +1,5 @@
 export { grade, type GradeParams } from "./pipeline/grade";
+export type { AxisProgressReporter } from "./pipeline/checkpoint";
 export {
   type Linter,
   type LintDiagnostic,

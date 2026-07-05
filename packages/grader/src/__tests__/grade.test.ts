@@ -68,6 +68,46 @@ describe("grade (sandbox モック)", () => {
     expect(output.degradedTasks).toBeNull();
   });
 
+  it("reporter に観点の開始・完了をリアルタイムに通知する", async () => {
+    const started: string[] = [];
+    const completed: string[] = [];
+    const output = await grade({
+      task: addTask,
+      testCases: addCases,
+      input: input({ "add.js": "export const add = (a, b) => a + b;" }),
+      sandbox: makeSandbox({ add: (a: number, b: number) => a + b }),
+      reporter: {
+        onAxisStart: (axis) => started.push(axis),
+        onAxisComplete: (result) => completed.push(result.axis),
+      },
+    });
+    expect(output.result).toBe("passed");
+    expect(started).toEqual([
+      "structure",
+      "contract",
+      "basic",
+      "spec",
+      "robustness",
+    ]);
+    expect(completed).toEqual(started);
+  });
+
+  it("失敗観点で打ち切ると reporter もそこで止まる", async () => {
+    const completed: string[] = [];
+    await grade({
+      task: addTask,
+      testCases: [
+        tc("contract", 0, [1, 2], undefined),
+        tc("basic", 0, [2, 3], { type: "number" }),
+        tc("spec", 0, [10, 20], { type: "string" }),
+      ],
+      input: input({ "add.js": "export const add = (a, b) => a + b;" }),
+      sandbox: makeSandbox({ add: (a: number, b: number) => a + b }),
+      reporter: { onAxisComplete: (result) => completed.push(result.axis) },
+    });
+    expect(completed).toEqual(["structure", "contract", "basic", "spec"]);
+  });
+
   it("途中の観点で失敗すれば partial (ここまでは通過)", async () => {
     const output = await grade({
       task: addTask,

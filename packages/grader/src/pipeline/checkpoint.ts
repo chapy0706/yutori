@@ -1,4 +1,4 @@
-import type { AxisResult } from "@yutori/contracts";
+import type { AxisResult, TestAxis } from "@yutori/contracts";
 
 import { basicAxis } from "../axes/basic";
 import type { AxisContext } from "../axes/context";
@@ -21,19 +21,44 @@ const AXES = [
   robustnessAxis,
 ] as const;
 
+/** AXES と同じ並びの観点名。onAxisStart で実行前に観点名を渡すために使う。 */
+export const AXIS_ORDER: readonly TestAxis[] = [
+  "structure",
+  "contract",
+  "basic",
+  "spec",
+  "robustness",
+];
+
 export type CheckpointOutcome = {
   axisResults: AxisResult[];
   errored: boolean;
 };
 
+/**
+ * 観点の進捗レポータ。UI (Worker 経由) が通過状況をリアルタイムに表示するための
+ * フック。判定ロジックには影響せず、観測のみを行う。
+ */
+export type AxisProgressReporter = {
+  /** その観点の判定を開始した (実行中表示用)。 */
+  onAxisStart?: (axis: TestAxis, index: number) => void;
+  /** その観点の判定が終わった (通過・失敗の確定)。 */
+  onAxisComplete?: (result: AxisResult, index: number) => void;
+};
+
 export async function runCheckpoints(
   context: AxisContext,
+  reporter?: AxisProgressReporter,
 ): Promise<CheckpointOutcome> {
   const axisResults: AxisResult[] = [];
 
-  for (const axis of AXES) {
+  for (let index = 0; index < AXES.length; index++) {
+    const axis = AXES[index];
+    if (axis === undefined) continue;
+    reporter?.onAxisStart?.(AXIS_ORDER[index] as TestAxis, index);
     const outcome = await axis(context);
     axisResults.push(outcome.axisResult);
+    reporter?.onAxisComplete?.(outcome.axisResult, index);
     if (!outcome.axisResult.passed) {
       return { axisResults, errored: outcome.errored };
     }

@@ -11,7 +11,7 @@ import { type SandboxRunner, defaultSandboxRunner } from "../sandbox/runner";
 import { parseContract } from "../spec/contract-descriptor";
 import { checkDegradation } from "../verdict/degradation";
 import { judgeResult } from "../verdict/judge";
-import { runCheckpoints } from "./checkpoint";
+import { type AxisProgressReporter, runCheckpoints } from "./checkpoint";
 import { type Linter, noopLinter, runLintStage } from "./lint-stage";
 
 /**
@@ -29,6 +29,11 @@ export type GradeParams = {
   input: GradingInput;
   sandbox?: SandboxRunner;
   linter?: Linter;
+  /**
+   * 観点の通過状況をリアルタイムに受け取るレポータ。UI が Worker 経由で
+   * 逐次表示するために使う。判定結果には影響しない (観測のみ)。
+   */
+  reporter?: AxisProgressReporter;
 };
 
 function errorOutput(elapsedMs: number): GradingOutput {
@@ -102,7 +107,10 @@ export async function grade(params: GradeParams): Promise<GradingOutput> {
     code: degradation.effectiveCode,
     testCases: params.testCases,
   };
-  const { axisResults, errored } = await runCheckpoints(context);
+  const { axisResults, errored } = await runCheckpoints(
+    context,
+    params.reporter,
+  );
 
   // 4. 合否確定 + レポート。
   return {
