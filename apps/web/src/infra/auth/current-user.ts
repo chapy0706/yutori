@@ -10,6 +10,18 @@ export async function getCurrentUserId(): Promise<string | null> {
 }
 
 /**
+ * 画面表示 (進捗・アンロック・作業中コード) に使うユーザー ID。
+ *
+ * DB モードは実ユーザーが要るので未ログインは null (既定表示)。fixture モードは
+ * インメモリのため開発用 ID にフォールバックし、提出 API と同じ主体で一貫させる。
+ */
+export async function getViewerUserId(): Promise<string | null> {
+  const userId = await getCurrentUserId();
+  if (userId !== null) return userId;
+  return isDatabaseMode() ? null : LOCAL_DEV_USER;
+}
+
+/**
  * 永続化に使うユーザー ID を解決する。
  *
  * DB モードでは実ユーザー (users テーブルへの FK) が必須のため、未ログインは拒否する。

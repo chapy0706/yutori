@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { loadTaskBundle } from "@/core/learning/course-service";
-import { getCurrentUserId } from "@/infra/auth/current-user";
+import { getViewerUserId } from "@/infra/auth/current-user";
 import {
   getCourseRepository,
   getProgressRepository,
@@ -20,7 +20,7 @@ export default async function TaskPage({
   params: Promise<{ slug: string; taskId: string }>;
 }) {
   const { slug, taskId } = await params;
-  const userId = await getCurrentUserId();
+  const userId = await getViewerUserId();
 
   const bundle = await loadTaskBundle(
     getCourseRepository(),

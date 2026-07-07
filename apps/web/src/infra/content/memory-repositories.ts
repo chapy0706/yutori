@@ -1,4 +1,7 @@
-import type { ProgressRepository } from "@/core/ports/progress-repository";
+import type {
+  ProgressRepository,
+  ProgressSnapshot,
+} from "@/core/ports/progress-repository";
 import type {
   NewSubmission,
   SubmissionRepository,
@@ -34,6 +37,23 @@ export class MemoryProgressRepository implements ProgressRepository {
     taskId: string,
   ): Promise<Record<string, string> | null> {
     return progressStore.get(key(userId, taskId))?.workingCode ?? null;
+  }
+
+  async listProgress(
+    userId: string,
+    taskIds: string[],
+  ): Promise<Record<string, ProgressSnapshot>> {
+    const out: Record<string, ProgressSnapshot> = {};
+    for (const taskId of taskIds) {
+      const row = progressStore.get(key(userId, taskId));
+      if (row !== undefined) {
+        out[taskId] = {
+          isCleared: row.isCleared,
+          attemptCount: row.attemptCount,
+        };
+      }
+    }
+    return out;
   }
 
   async saveWorkingCode(

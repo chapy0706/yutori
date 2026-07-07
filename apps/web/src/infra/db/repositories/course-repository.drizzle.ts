@@ -20,6 +20,15 @@ import { courses, tasks, testCases } from "@/infra/db/schema";
  * parse してからドメイン型として扱う (型の嘘を通さない)。
  */
 export class DrizzleCourseRepository implements CourseRepository {
+  async listCourses(): Promise<Course[]> {
+    const rows = await getDb()
+      .select()
+      .from(courses)
+      .where(eq(courses.isPublished, true))
+      .orderBy(asc(courses.orderIndex));
+    return rows.map((row) => CourseSchema.parse(row));
+  }
+
   async findCourseBySlug(slug: string): Promise<Course | null> {
     const rows = await getDb()
       .select()
@@ -38,6 +47,15 @@ export class DrizzleCourseRepository implements CourseRepository {
       .limit(1);
     const row = rows[0];
     return row === undefined ? null : TaskSchema.parse(row);
+  }
+
+  async listTasks(courseId: string): Promise<Task[]> {
+    const rows = await getDb()
+      .select()
+      .from(tasks)
+      .where(eq(tasks.courseId, courseId))
+      .orderBy(asc(tasks.orderIndex));
+    return rows.map((row) => TaskSchema.parse(row));
   }
 
   async findTestCases(taskId: string): Promise<TestCase[]> {

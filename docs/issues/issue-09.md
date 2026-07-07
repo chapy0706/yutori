@@ -1,7 +1,7 @@
 ---
-status: open
+status: closed
 created_at: 2026-05-24
-closed_at:
+closed_at: 2026-07-07
 ---
 
 # issue-09: コース一覧・課題一覧ページ

@@ -96,11 +96,89 @@ export const FIXTURE_TEST_CASES: TestCase[] = [
   },
 ];
 
-/** slug/taskId が固定フィクスチャに一致するか。 */
-export const FIXTURE_SLUG = FIXTURE_COURSE.slug;
-export const FIXTURE_TASK_ID = FIXTURE_TASK.id;
+// ---------------------------------------------------------------------------
+// 2 コース目 (アンロック挙動の確認用)。sum をクリアするとアンロックされる。
+// ---------------------------------------------------------------------------
 
-export const STARTER_CODE: Record<string, string> = {
-  "sum.js":
-    "// 2つの数を受け取り、その和を返す add 関数を書いてみよう\n// export const add = (a, b) => ...\n",
+export const FIXTURE_COURSE_2: Course = {
+  id: "doubler",
+  slug: "doubler",
+  title: "数を2倍にする",
+  description: "最初のコースをクリアすると挑戦できる、次のステップ。",
+  orderIndex: 1,
+  playableBuildPath: null,
+  finalSpec: { type: "object" },
+  isPublished: true,
+  createdAt: now,
 };
+
+export const FIXTURE_TASK_2: Task = {
+  id: "double",
+  courseId: "doubler",
+  orderIndex: 1,
+  title: "数を2倍にする",
+  description:
+    "1つの数値を受け取り、その2倍を返す関数 double を作ろう。型と構造が仕様に合っているかで採点される。",
+  targetFiles: ["double.js"],
+  contractSchema: {
+    export: "double",
+    file: "double.js",
+    params: [{ type: "number" }],
+    returns: { type: "number" },
+  },
+  timeBudgetMs: 2000,
+  goalMediaPath: null,
+  referenceImpl: { "double.js": "export const double = (n) => n * 2;" },
+  createdAt: now,
+};
+
+export const FIXTURE_TEST_CASES_2: TestCase[] = [
+  {
+    id: "double-contract-0",
+    taskId: "double",
+    axis: "contract",
+    orderIndex: 0,
+    payload: { input: [3], expectedSchema: null, onFailHint: null },
+  },
+  {
+    id: "double-basic-0",
+    taskId: "double",
+    axis: "basic",
+    orderIndex: 0,
+    payload: {
+      input: [4],
+      expectedSchema: { type: "number" },
+      onFailHint: "4 を渡したら、数値がひとつ返ってくるかな。",
+    },
+  },
+  {
+    id: "double-spec-0",
+    taskId: "double",
+    axis: "spec",
+    orderIndex: 0,
+    payload: {
+      input: [10],
+      expectedSchema: { type: "number" },
+      onFailHint: null,
+    },
+  },
+  {
+    id: "double-robustness-0",
+    taskId: "double",
+    axis: "robustness",
+    orderIndex: 0,
+    payload: {
+      input: [0],
+      expectedSchema: { type: "number" },
+      onFailHint: "0 のような端の入力でも落ちずに動くかな。",
+    },
+  },
+];
+
+/** 全フィクスチャ (コース一覧・課題一覧はこれらを参照する)。 */
+export const FIXTURE_COURSES: Course[] = [FIXTURE_COURSE, FIXTURE_COURSE_2];
+export const FIXTURE_TASKS: Task[] = [FIXTURE_TASK, FIXTURE_TASK_2];
+export const FIXTURE_ALL_TEST_CASES: TestCase[] = [
+  ...FIXTURE_TEST_CASES,
+  ...FIXTURE_TEST_CASES_2,
+];

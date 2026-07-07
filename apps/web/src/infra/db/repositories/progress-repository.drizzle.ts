@@ -1,6 +1,9 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
-import type { ProgressRepository } from "@/core/ports/progress-repository";
+import type {
+  ProgressRepository,
+  ProgressSnapshot,
+} from "@/core/ports/progress-repository";
 import { getDb } from "@/infra/db/client";
 import { taskProgress } from "@/infra/db/schema";
 
@@ -33,6 +36,34 @@ export class DrizzleProgressRepository implements ProgressRepository {
       .limit(1);
     const row = rows[0];
     return row === undefined ? null : asCodeMap(row.workingCode);
+  }
+
+  async listProgress(
+    userId: string,
+    taskIds: string[],
+  ): Promise<Record<string, ProgressSnapshot>> {
+    if (taskIds.length === 0) return {};
+    const rows = await getDb()
+      .select({
+        taskId: taskProgress.taskId,
+        isCleared: taskProgress.isCleared,
+        attemptCount: taskProgress.attemptCount,
+      })
+      .from(taskProgress)
+      .where(
+        and(
+          eq(taskProgress.userId, userId),
+          inArray(taskProgress.taskId, taskIds),
+        ),
+      );
+    const out: Record<string, ProgressSnapshot> = {};
+    for (const row of rows) {
+      out[row.taskId] = {
+        isCleared: row.isCleared,
+        attemptCount: row.attemptCount,
+      };
+    }
+    return out;
   }
 
   async saveWorkingCode(
