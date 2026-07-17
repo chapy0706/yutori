@@ -40,3 +40,12 @@ export const ProfileSchema = z.object({
     .nullable(),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
+
+/**
+ * プロフィール設定の更新入力 (境界での検証用)。
+ * いまは並走者・ランキング表示の ON/OFF のみを扱う (issue-10)。
+ */
+export const ProfileUpdateSchema = z.object({
+  showRanking: z.boolean(),
+});
+export type ProfileUpdate = z.infer<typeof ProfileUpdateSchema>;
