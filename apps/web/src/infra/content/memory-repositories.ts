@@ -38,6 +38,24 @@ const showRankingStore = new Map<string, boolean>();
 
 const key = (userId: string, taskId: string) => `${userId}::${taskId}`;
 
+/**
+ * 課題をクリア扱いにする (スキップ券の使用など、提出以外の経路から)。
+ * 初回クリア日は一度確定したら動かさない。reward の memory 実装から使う。
+ */
+export function markTaskClearedInMemory(
+  userId: string,
+  taskId: string,
+  clearedOn: string,
+): void {
+  const existing = progressStore.get(key(userId, taskId));
+  progressStore.set(key(userId, taskId), {
+    attemptCount: existing?.attemptCount ?? 0,
+    isCleared: true,
+    workingCode: existing?.workingCode ?? null,
+    firstClearedOn: existing?.firstClearedOn ?? clearedOn,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // fixture 用ダミーデータのシード (local-dev-user 向け)
 // ---------------------------------------------------------------------------

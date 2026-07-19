@@ -1,4 +1,5 @@
 import type { DashboardRepository } from "@/core/ports/dashboard-repository";
+import { addDays, toDay } from "@/core/shared/day";
 
 /**
  * 進捗集計の UseCase。
@@ -8,23 +9,14 @@ import type { DashboardRepository } from "@/core/ports/dashboard-repository";
  * ロケールやタイムゾーンに依存する曖昧さを境界へ押し出す (MVP の単純化)。
  */
 
+// 日付ユーティリティは core/shared/day に集約。既存の import 元との互換のため再公開する。
+export { addDays, toDay } from "@/core/shared/day";
+
 /** 草に表示する日数 (26 週間ぶん)。スマホでは横スクロールで収める。 */
 export const GRASS_DAYS = 182;
 
 /** 週次サマリの「1 週間」= 直近 7 日 (今日を含む)。カレンダー週ではなくローリング。 */
 const WEEK_DAYS = 7;
-
-/** Date を 'YYYY-MM-DD' (UTC) に落とす。 */
-export function toDay(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-/** 'YYYY-MM-DD' に delta 日を加算した 'YYYY-MM-DD' を返す。 */
-export function addDays(day: string, delta: number): string {
-  const d = new Date(`${day}T00:00:00.000Z`);
-  d.setUTCDate(d.getUTCDate() + delta);
-  return d.toISOString().slice(0, 10);
-}
 
 /** 草の 1 マス。count は当日の提出数 (濃淡の元)。 */
 export type GrassCell = { day: string; count: number };

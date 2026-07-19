@@ -9,6 +9,7 @@ export const AcquisitionSourceSchema = z.enum([
   "coin",
   "task_clear",
   "course_clear",
+  "gacha",
 ]);
 export type AcquisitionSource = z.infer<typeof AcquisitionSourceSchema>;
 

@@ -61,6 +61,7 @@ export const acquisitionSourceEnum = pgEnum("acquisition_source", [
   "coin",
   "task_clear",
   "course_clear",
+  "gacha",
 ]);
 
 // ===========================================================================
@@ -300,6 +301,36 @@ export const dailyBonuses = pgTable(
   },
   (t) => ({
     userDayUnique: unique().on(t.userId, t.grantedOn),
+  }),
+);
+
+/**
+ * skipTickets: 課題スキップ券。ガチャの低確率枠で入手する消費アイテム。
+ * Cosmetic（背景・アイコン・音）とは性質が異なるため別テーブルで持つ。
+ *
+ * 1 行 = 1 枚。所持中（未使用）は usedAt が null。ガチャの出現制御に使う:
+ *  - 未使用の券を所持していれば再出現させない
+ *  - 直近の使用から 3 ヶ月は再出現させない
+ * usedAt は「消費の確定」を表す 1 回限りの更新で、それ以外の更新はしない。
+ */
+export const skipTickets = pgTable(
+  "skip_tickets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    acquiredAt: timestamp("acquired_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** 使用日時。null は未使用（所持中）。使用した課題を usedTaskId に残す。 */
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    usedTaskId: uuid("used_task_id").references(() => tasks.id, {
+      onDelete: "set null",
+    }),
+  },
+  (t) => ({
+    userIdx: index("skip_tickets_user_idx").on(t.userId),
   }),
 );
 

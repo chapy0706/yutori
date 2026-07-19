@@ -21,7 +21,7 @@ import {
   FIXTURE_TASKS,
 } from "../content/fixtures";
 import { getDb } from "./client";
-import { courses, tasks, testCases } from "./schema";
+import { cosmeticItems, courses, tasks, testCases } from "./schema";
 
 // fixture の文字列 ID -> DB の固定 UUID。検証時に URL で辿れるようにする。
 const COURSE_UUID: Record<string, string> = {
@@ -91,6 +91,41 @@ async function main() {
     ];
   });
   if (rows.length > 0) await db.insert(testCases).values(rows);
+
+  // Cosmetic カタログ (ガチャの cosmetic 枠の抽選対象)。fixture と同じ 4 種。
+  // coinCost は null: コインでは買えず、ガチャ/完走でのみ入手できる。
+  const COSMETICS = [
+    {
+      id: "33333333-3333-3333-3333-333333333331",
+      kind: "background" as const,
+      name: "森の背景",
+      assetPath: "/cosmetics/forest.png",
+    },
+    {
+      id: "33333333-3333-3333-3333-333333333332",
+      kind: "background" as const,
+      name: "夜空の背景",
+      assetPath: "/cosmetics/night.png",
+    },
+    {
+      id: "33333333-3333-3333-3333-333333333333",
+      kind: "icon" as const,
+      name: "ねこアイコン",
+      assetPath: "/cosmetics/cat.png",
+    },
+    {
+      id: "33333333-3333-3333-3333-333333333334",
+      kind: "bgm" as const,
+      name: "lo-fi BGM",
+      assetPath: "/cosmetics/lofi.mp3",
+    },
+  ];
+  for (const cosmetic of COSMETICS) {
+    await db
+      .insert(cosmeticItems)
+      .values({ ...cosmetic, coinCost: null })
+      .onConflictDoNothing();
+  }
 
   console.log("seed 完了");
   console.log("  コース一覧: /courses");

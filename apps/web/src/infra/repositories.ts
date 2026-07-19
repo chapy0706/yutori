@@ -2,6 +2,7 @@ import type { CourseRepository } from "@/core/ports/course-repository";
 import type { DashboardRepository } from "@/core/ports/dashboard-repository";
 import type { ProfileRepository } from "@/core/ports/profile-repository";
 import type { ProgressRepository } from "@/core/ports/progress-repository";
+import type { RewardRepository } from "@/core/ports/reward-repository";
 import type { SubmissionRepository } from "@/core/ports/submission-repository";
 
 import { FixtureCourseRepository } from "@/infra/content/fixture-course-repository";
@@ -11,10 +12,12 @@ import {
   MemoryProgressRepository,
   MemorySubmissionRepository,
 } from "@/infra/content/memory-repositories";
+import { MemoryRewardRepository } from "@/infra/content/memory-reward-repository";
 import { DrizzleCourseRepository } from "@/infra/db/repositories/course-repository.drizzle";
 import { DrizzleDashboardRepository } from "@/infra/db/repositories/dashboard-repository.drizzle";
 import { DrizzleProfileRepository } from "@/infra/db/repositories/profile-repository.drizzle";
 import { DrizzleProgressRepository } from "@/infra/db/repositories/progress-repository.drizzle";
+import { DrizzleRewardRepository } from "@/infra/db/repositories/reward-repository.drizzle";
 import { DrizzleSubmissionRepository } from "@/infra/db/repositories/submission-repository.drizzle";
 
 /**
@@ -63,4 +66,10 @@ export function getProfileRepository(): ProfileRepository {
   return useDatabase()
     ? new DrizzleProfileRepository()
     : new MemoryProfileRepository();
+}
+
+export function getRewardRepository(): RewardRepository {
+  return useDatabase()
+    ? new DrizzleRewardRepository()
+    : new MemoryRewardRepository();
 }

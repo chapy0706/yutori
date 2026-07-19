@@ -1,14 +1,17 @@
 import Link from "next/link";
 
 import { loadDashboardOverview } from "@/core/learning/progress-service";
+import { toDay } from "@/core/shared/day";
 import { pickPeers } from "@/core/social/peer-service";
 import { getViewerUserId } from "@/infra/auth/current-user";
 import {
   getDashboardRepository,
   getProfileRepository,
+  getRewardRepository,
 } from "@/infra/repositories";
 import { GrassGraph } from "@/ui/components/contribution/grass-graph";
 import { ProgressSummary } from "@/ui/components/dashboard/progress-summary";
+import { DailyGacha } from "@/ui/components/reward/daily-gacha";
 import { CheerNotice } from "@/ui/components/social/cheer-notice";
 import { PeerList } from "@/ui/components/social/peer-list";
 import { RankingToggle } from "@/ui/components/social/ranking-toggle";
@@ -45,10 +48,16 @@ export default async function DashboardPage() {
   }
 
   const dashboard = getDashboardRepository();
-  const [overview, showRanking] = await Promise.all([
-    loadDashboardOverview(dashboard, userId, new Date()),
-    getProfileRepository().getShowRanking(userId),
-  ]);
+  const reward = getRewardRepository();
+  const now = new Date();
+  const [overview, showRanking, todaysOutcome, rewardContext, skipTickets] =
+    await Promise.all([
+      loadDashboardOverview(dashboard, userId, now),
+      getProfileRepository().getShowRanking(userId),
+      reward.findBonusOn(userId, toDay(now)),
+      reward.loadGachaContext(userId, now),
+      reward.countAvailableSkipTickets(userId),
+    ]);
 
   const peers = showRanking
     ? pickPeers(
@@ -69,6 +78,22 @@ export default async function DashboardPage() {
       </header>
 
       <CheerNotice unreadCount={overview.unreadEncouragement} />
+
+      <section className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+            今日のおくりもの
+          </h2>
+          <p className="text-xs text-neutral-500 tabular-nums dark:text-neutral-400">
+            コイン {rewardContext.coinBalance} ・ 連続{" "}
+            {rewardContext.currentStreak}日 ・ スキップ券 {skipTickets} 枚
+          </p>
+        </div>
+        <DailyGacha
+          initialClaimed={todaysOutcome !== null}
+          initialOutcome={todaysOutcome}
+        />
+      </section>
 
       <GrassGraph contribution={overview.contribution} />
 
